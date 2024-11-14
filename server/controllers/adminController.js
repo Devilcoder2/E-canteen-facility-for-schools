@@ -1,5 +1,6 @@
 const Admin = require('../models/Admin');
 const Menu = require('../models/Menu');
+const Order = require('../models/Orders');
 
 // Controller to fetch admin profile
 exports.getAdminProfile = async (req, res) => {
@@ -43,7 +44,8 @@ exports.updateAdminProfile = async (req, res) => {
 
 // Add a new menu item
 exports.addMenuItem = async (req, res) => {
-    const { name, price, image, ratings, category, description, label } = req.body;
+    const { name, price, image, ratings, category, description, label } =
+        req.body;
 
     try {
         const newItem = await Menu.create({
@@ -79,7 +81,8 @@ exports.getMenuItems = async (req, res) => {
 // Update an existing menu item
 exports.updateMenuItem = async (req, res) => {
     const { id } = req.params;
-    const { name, price, image, ratings, category, description, label } = req.body;
+    const { name, price, image, ratings, category, description, label } =
+        req.body;
 
     try {
         const updatedItem = await Menu.findByIdAndUpdate(
@@ -113,6 +116,70 @@ exports.deleteMenuItem = async (req, res) => {
         }
 
         res.status(200).json({ message: 'Menu item deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get a list of all orders (filterable by status)
+exports.getOrders = async (req, res) => {
+    const { status } = req.query;
+
+    try {
+        const filter = { schoolId: req.user.id };
+        if (status) filter.status = status;
+
+        const orders = await Order.find(filter).sort({ createdAt: -1 });
+        res.status(200).json(orders);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Get details of a specific order
+exports.getOrderDetails = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const order = await Order.findById(id);
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.status(200).json(order);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Update the status of an order
+exports.updateOrderStatus = async (req, res) => {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    const validStatuses = [
+        'Received',
+        'Preparing',
+        'Packed',
+        'Picked',
+        'Delivered',
+    ];
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ message: 'Invalid status' });
+    }
+
+    try {
+        const order = await Order.findByIdAndUpdate(
+            id,
+            { status, updatedAt: Date.now() },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        res.status(200).json({ message: 'Order status updated', order });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
