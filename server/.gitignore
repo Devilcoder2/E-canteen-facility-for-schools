@@ -1,0 +1,48 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs
+*.log
+*.log.*
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variables
+.env
+
+# Build directory
+dist/
+build/
+
+# Cache directories
+.cache/
+.tmp/
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+
+# OS generated files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*.bak
+
+# Optional NPM files
+package-lock.json
+yarn.lock
+
+# Coverage reports
+coverage/
+.nyc_output/
