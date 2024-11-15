@@ -134,7 +134,7 @@ exports.getOrders = async (req, res) => {
         if (!orders || orders.length === 0) {
             return res.status(404).json({ message: 'No orders found' });
         }
-        
+
         res.status(200).json(orders);
     } catch (error) {
         console.error('Error fetching orders:', error);

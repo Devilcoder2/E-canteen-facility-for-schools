@@ -9,6 +9,8 @@ const {
     getOrders,
     getOrderDetails,
     getCurrentOrders,
+    cancelOrder,
+    reorderOrder
 } = require('../controllers/studentController');
 
 //PROFILE MANAGEMENT 
@@ -21,5 +23,9 @@ router.post('/order', verifyStudent, placeOrder); // Place an order
 router.get('/orders', verifyStudent, getOrders); //Get all orders of the student
 router.get('/orders/:orderId', verifyStudent, getOrderDetails); //Get details of a specific order
 router.get('/currentOrders', verifyStudent, getCurrentOrders); //Get all live (current) orders
+
+//CANCEL & REORDER MANAGEMENT
+router.patch('/order/cancel/:orderId', verifyStudent, cancelOrder); // Route to cancel an order
+router.post('/order/reorder/:orderId', verifyStudent, reorderOrder); // Route to reorder a previous order
 
 module.exports = router;

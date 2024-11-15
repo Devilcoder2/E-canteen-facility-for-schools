@@ -113,7 +113,7 @@ exports.placeOrder = async (req, res) => {
             totalAmount: totalPrice,
             status: 'Received',
             schoolId: student.schoolId,
-            cookingInstructions: instructions
+            cookingInstructions: instructions,
         });
 
         const savedOrder = await newOrder.save();
@@ -165,5 +165,77 @@ exports.getCurrentOrders = async (req, res) => {
         res.status(200).json({ success: true, data: currentOrders });
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch current orders' });
+    }
+};
+
+// Cancel an order if it's not packed yet
+exports.cancelOrder = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+        // Find the order by ID
+        const order = await Order.findById(orderId);
+
+        // Check if the order belongs to the student making the request
+        if (!order || order.studentId.toString() !== req.user._id.toString()) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Check if the order is in a cancelable state
+        if (
+            order.status === 'Packed' ||
+            order.status === 'Picked' ||
+            order.status === 'Delivered'
+        ) {
+            return res
+                .status(400)
+                .json({ message: 'Order cannot be canceled at this stage' });
+        }
+
+        // Update the order status to canceled
+        order.status = 'Canceled';
+        await order.save();
+
+        res.status(200).json({ message: 'Order canceled successfully', order });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// Reorder a previous order
+exports.reorderOrder = async (req, res) => {
+    const { orderId } = req.params;
+
+    try {
+        // Find the existing order by ID
+        const existingOrder = await Order.findById(orderId);
+
+        // Check if the order exists and belongs to the student making the request
+        if (
+            !existingOrder ||
+            existingOrder.studentId.toString() !== req.user._id.toString()
+        ) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+
+        // Create a new order based on the previous order's items
+        const newOrder = new Order({
+            studentId: existingOrder.studentId,
+            studentName: existingOrder.studentName,
+            schoolId: existingOrder.schoolId,
+            items: existingOrder.items,
+            totalAmount: existingOrder.totalAmount,
+            cookingInstructions: existingOrder.cookingInstructions,
+            status: 'Received',
+        });
+
+        await newOrder.save();
+
+        res.status(201).json({
+            message: 'Order placed successfully',
+            order: newOrder,
+        });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 };

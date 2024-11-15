@@ -4,4 +4,5 @@ const validStatuses = [
     'Packed',
     'Picked',
     'Delivered',
+    'Canceled'
 ];
