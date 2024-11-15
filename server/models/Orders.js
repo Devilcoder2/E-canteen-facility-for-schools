@@ -8,8 +8,7 @@ const orderSchema = new mongoose.Schema({
     },
     studentName: { type: String, required: true },
     schoolId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Admin',
+        type: String, // Changed from ObjectId to String
         required: true,
     },
     items: [
