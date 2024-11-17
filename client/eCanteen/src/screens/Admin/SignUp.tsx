@@ -1,15 +1,17 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import FntAwesome from '@expo/vector-icons/FontAwesome6';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
+    NativeSyntheticEvent,
     Platform,
     SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
+    TextInputChangeEventData,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
@@ -18,6 +20,60 @@ import {
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const SignUp = () => {
+    const [name, setName] = useState<string>('');
+    const [phoneNumber, setPhoneNumber] = useState<string>('');
+    const [address, setAddress] = useState<string>('');
+    const [schoolId, setSchoolId] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+
+    const nameChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setName(e.nativeEvent.text);
+    };
+
+    const phoneNumberChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setPhoneNumber(e.nativeEvent.text);
+    };
+
+    const addressChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setAddress(e.nativeEvent.text);
+    };
+
+    const schoolIdChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setSchoolId(e.nativeEvent.text);
+    };
+
+    const passwordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setPassword(e.nativeEvent.text);
+    };
+
+    const confirmPasswordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setConfirmPassword(e.nativeEvent.text);
+    };
+
+    const signUpHandler = () => {
+        console.log(
+            name,
+            phoneNumber,
+            address,
+            schoolId,
+            password,
+            confirmPassword
+        );
+    };
+
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
@@ -50,6 +106,8 @@ const SignUp = () => {
                                 placeholder='Name'
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, { marginLeft: 6 }]}
+                                value={name}
+                                onChange={nameChangeHandler}
                             />
                         </View>
 
@@ -66,6 +124,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, { paddingLeft: 3 }]}
                                 keyboardType='number-pad'
+                                value={phoneNumber}
+                                onChange={phoneNumberChangeHandler}
                             />
                         </View>
 
@@ -82,6 +142,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, { marginLeft: 8 }]}
                                 keyboardType='number-pad'
+                                value={address}
+                                onChange={addressChangeHandler}
                             />
                         </View>
 
@@ -97,6 +159,8 @@ const SignUp = () => {
                                 placeholder='School Id'
                                 placeholderTextColor='#9e9e9e'
                                 style={styles.input}
+                                value={schoolId}
+                                onChange={schoolIdChangeHandler}
                             />
                         </View>
 
@@ -113,6 +177,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, styles.inputPadding]}
                                 secureTextEntry
+                                value={password}
+                                onChange={passwordChangeHandler}
                             />
                         </View>
 
@@ -129,11 +195,16 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, styles.inputPadding]}
                                 secureTextEntry
+                                value={confirmPassword}
+                                onChange={confirmPasswordChangeHandler}
                             />
                         </View>
 
                         {/* Login Button */}
-                        <TouchableOpacity style={styles.loginButton}>
+                        <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={signUpHandler}
+                        >
                             <Text style={styles.loginButtonText}>SIGN UP</Text>
                             <FontAwesome
                                 name='arrow-right'

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     View,
     KeyboardAvoidingView,
@@ -12,6 +12,8 @@ import {
     Dimensions,
     ImageBackground,
     Platform,
+    NativeSyntheticEvent,
+    TextInputChangeEventData,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
@@ -23,14 +25,35 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 type RootStackParamList = {
     ALogin: undefined;
     ASignUp: undefined;
+    AdminHome: undefined;
 };
 
 const Login = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+    const [schoolId, setSchoolId] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+
+    const loginHandler = () => {
+        console.log(schoolId, password);
+        navigation.navigate('AdminHome');
+    };
+
     const signUpHandler = () => {
         navigation.navigate('ASignUp');
+    };
+
+    const schoolIdChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setSchoolId(e.nativeEvent.text);
+    };
+
+    const passwordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setPassword(e.nativeEvent.text);
     };
 
     return (
@@ -75,7 +98,8 @@ const Login = () => {
                                     placeholder='School Id'
                                     placeholderTextColor='#9e9e9e'
                                     style={styles.input}
-                                    secureTextEntry
+                                    value={schoolId}
+                                    onChange={schoolIdChangeHandler}
                                 />
                             </View>
 
@@ -91,6 +115,8 @@ const Login = () => {
                                     placeholder='Password'
                                     placeholderTextColor='#9e9e9e'
                                     style={[styles.input, styles.inputPadding]}
+                                    value={password}
+                                    onChange={passwordChangeHandler}
                                     secureTextEntry
                                 />
                                 <TouchableOpacity>
@@ -101,7 +127,10 @@ const Login = () => {
                             </View>
 
                             {/* Login Button */}
-                            <TouchableOpacity style={styles.loginButton}>
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={loginHandler}
+                            >
                                 <Text style={styles.loginButtonText}>
                                     LOGIN
                                 </Text>

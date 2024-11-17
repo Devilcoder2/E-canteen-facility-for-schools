@@ -7,11 +7,16 @@ import * as Haptics from 'expo-haptics';
 
 import StudentLogin from './screens/Student/Login';
 import StudentSignUp from './screens/Student/SignUp';
+import StudentHome from './screens/Student/Home';
 import AdminLogin from './screens/Admin/Login';
 import AdminSignUp from './screens/Admin/SignUp';
+import AdminHome from './screens/Admin/Home';
 
 //Stack Navigator
 const StudentLoginStack = createNativeStackNavigator();
+const AdminLoginStack = createNativeStackNavigator();
+const MainStack = createNativeStackNavigator();
+
 const StackGroupStudentLogin = () => {
     return (
         <StudentLoginStack.Navigator screenOptions={{ headerShown: false }}>
@@ -27,7 +32,6 @@ const StackGroupStudentLogin = () => {
     );
 };
 
-const AdminLoginStack = createNativeStackNavigator();
 const StackGroupAdminLogin = () => {
     return (
         <AdminLoginStack.Navigator screenOptions={{ headerShown: false }}>
@@ -101,10 +105,20 @@ const TabGroup = () => {
     );
 };
 
+const StackGroupMain = () => {
+    return (
+        <MainStack.Navigator screenOptions={{ headerShown: false }}>
+            <MainStack.Screen name='LoginTabs' component={TabGroup} />
+            <MainStack.Screen name='AdminHome' component={AdminHome} />
+            <MainStack.Screen name='StudentHome' component={StudentHome} />
+        </MainStack.Navigator>
+    );
+};
+
 export default function Navigation() {
     return (
         <NavigationContainer>
-            <TabGroup />
+            <StackGroupMain />
         </NavigationContainer>
     );
 }

@@ -2,17 +2,19 @@ import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Dimensions,
     ImageBackground,
     Keyboard,
     KeyboardAvoidingView,
+    NativeSyntheticEvent,
     Platform,
     SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
+    TextInputChangeEventData,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
@@ -23,14 +25,42 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 type RootStackParamList = {
     SLogin: undefined;
     SSignUp: undefined;
+    StudentHome: undefined;
 };
 
 const Login = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [schoolId, setSchoolId] = useState<string>('');
+
     const signUpHandler = () => {
         navigation.navigate('SSignUp');
+    };
+
+    const loginHandler = () => {
+        console.log(email, password, schoolId);
+        navigation.navigate('StudentHome');
+    };
+
+    const emailChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setEmail(e.nativeEvent.text);
+    };
+
+    const passwordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setPassword(e.nativeEvent.text);
+    };
+
+    const schoolIdChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setSchoolId(e.nativeEvent.text);
     };
 
     return (
@@ -76,6 +106,8 @@ const Login = () => {
                                     placeholderTextColor='#9e9e9e'
                                     style={[styles.input, styles.inputPadding2]}
                                     keyboardType='email-address'
+                                    value={email}
+                                    onChange={emailChangeHandler}
                                 />
                             </View>
 
@@ -92,6 +124,8 @@ const Login = () => {
                                     placeholderTextColor='#9e9e9e'
                                     style={[styles.input, styles.inputPadding]}
                                     secureTextEntry
+                                    value={password}
+                                    onChange={passwordChangeHandler}
                                 />
                                 <TouchableOpacity>
                                     <Text style={styles.forgotText}>
@@ -112,11 +146,16 @@ const Login = () => {
                                     placeholder='School Id'
                                     placeholderTextColor='#9e9e9e'
                                     style={styles.input}
+                                    value={schoolId}
+                                    onChange={schoolIdChangeHandler}
                                 />
                             </View>
 
                             {/* Login Button */}
-                            <TouchableOpacity style={styles.loginButton}>
+                            <TouchableOpacity
+                                style={styles.loginButton}
+                                onPress={loginHandler}
+                            >
                                 <Text style={styles.loginButtonText}>
                                     LOGIN
                                 </Text>

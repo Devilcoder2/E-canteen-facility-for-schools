@@ -1,14 +1,16 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
+    NativeSyntheticEvent,
     Platform,
     SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
+    TextInputChangeEventData,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
@@ -17,6 +19,46 @@ import {
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 const SignUp = () => {
+    const [name, setName] = useState<string>('');
+    const [email, setEmail] = useState<string>('');
+    const [password, setPassword] = useState<string>('');
+    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [schoolId, setSchoolId] = useState<string>('');
+
+    const signUpHandler = () => {
+        console.log(name, email, password, confirmPassword, schoolId);
+    };
+
+    const nameChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setName(e.nativeEvent.text);
+    };
+
+    const emailChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setEmail(e.nativeEvent.text);
+    };
+
+    const passwordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setPassword(e.nativeEvent.text);
+    };
+
+    const confirmPasswordChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setConfirmPassword(e.nativeEvent.text);
+    };
+
+    const schoolIdChangeHandler = (
+        e: NativeSyntheticEvent<TextInputChangeEventData>
+    ) => {
+        setSchoolId(e.nativeEvent.text);
+    };
+
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.container}>
@@ -49,6 +91,8 @@ const SignUp = () => {
                                 placeholder='Name'
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, { marginLeft: 6 }]}
+                                value={name}
+                                onChange={nameChangeHandler}
                             />
                         </View>
 
@@ -65,6 +109,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, styles.inputPadding]}
                                 keyboardType='email-address'
+                                value={email}
+                                onChange={emailChangeHandler}
                             />
                         </View>
 
@@ -81,6 +127,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, styles.inputPadding]}
                                 secureTextEntry
+                                value={password}
+                                onChange={passwordChangeHandler}
                             />
                         </View>
 
@@ -97,6 +145,8 @@ const SignUp = () => {
                                 placeholderTextColor='#9e9e9e'
                                 style={[styles.input, styles.inputPadding]}
                                 secureTextEntry
+                                value={confirmPassword}
+                                onChange={confirmPasswordChangeHandler}
                             />
                         </View>
 
@@ -112,11 +162,16 @@ const SignUp = () => {
                                 placeholder='School Id'
                                 placeholderTextColor='#9e9e9e'
                                 style={styles.input}
+                                value={schoolId}
+                                onChange={schoolIdChangeHandler}
                             />
                         </View>
 
                         {/* Login Button */}
-                        <TouchableOpacity style={styles.loginButton}>
+                        <TouchableOpacity
+                            style={styles.loginButton}
+                            onPress={signUpHandler}
+                        >
                             <Text style={styles.loginButtonText}>SIGN UP</Text>
                             <FontAwesome
                                 name='arrow-right'
