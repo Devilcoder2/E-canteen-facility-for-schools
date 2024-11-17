@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors()); // or specify the allowed origin
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
