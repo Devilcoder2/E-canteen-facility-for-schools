@@ -19,7 +19,9 @@ const StackGroupStudentLogin = () => {
             <StudentLoginStack.Screen
                 name='SSignUp'
                 component={StudentSignUp}
-                options={{ presentation: 'modal' }}
+                options={{
+                    presentation: 'modal',
+                }}
             />
         </StudentLoginStack.Navigator>
     );

@@ -1,22 +1,22 @@
+import FontAwesome from '@expo/vector-icons/FontAwesome5';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import {
-    View,
+    Dimensions,
+    ImageBackground,
+    Keyboard,
     KeyboardAvoidingView,
+    Platform,
     SafeAreaView,
-    Text,
     StyleSheet,
+    Text,
     TextInput,
     TouchableOpacity,
     TouchableWithoutFeedback,
-    Keyboard,
-    Dimensions,
-    ImageBackground,
-    Platform,
+    View,
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
-import FontAwesome from '@expo/vector-icons/FontAwesome5';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
