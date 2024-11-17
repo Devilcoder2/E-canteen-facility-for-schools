@@ -1,77 +1,81 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import FntAwesome from '@expo/vector-icons/FontAwesome6';
+import { Formik } from 'formik';
 import React, { useState } from 'react';
 import {
     Dimensions,
     Keyboard,
     KeyboardAvoidingView,
-    NativeSyntheticEvent,
     Platform,
     SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
-    TextInputChangeEventData,
     TouchableOpacity,
     TouchableWithoutFeedback,
     View,
 } from 'react-native';
+import { object, string } from 'yup';
+
+import axios from 'axios';
+import ErrorBottom from '../../components/ErrorBottom';
+import { BASE_URL } from '../../constants';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
+let signUpSchema = object({
+    name: string().required('Name is Required!'),
+    phoneNumber: string()
+        .matches(/^[6-9]\d{9}$/, 'Please enter a valid mobile number') // Regex for valid mobile number
+        .required('Mobile number is required'),
+    address: string(),
+    schoolId: string().required('School Id is Required!'),
+    password: string().required('Password is Required!'),
+    confirmPassword: string().required('Confirm Password is Required!'),
+});
+
 const SignUp = () => {
-    const [name, setName] = useState<string>('');
-    const [phoneNumber, setPhoneNumber] = useState<string>('');
-    const [address, setAddress] = useState<string>('');
-    const [schoolId, setSchoolId] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [confirmPassword, setConfirmPassword] = useState<string>('');
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const nameChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setName(e.nativeEvent.text);
+    const signUpHandler = async (values: any) => {
+        try {
+            const {
+                name,
+                phoneNumber,
+                address,
+                schoolId,
+                password,
+                confirmPassword,
+            } = values;
+
+            if (password !== confirmPassword) {
+                setErrorMessage('Passwords must match!');
+                return;
+            }
+
+            const reqBody = {
+                name,
+                phone: phoneNumber,
+                address,
+                schoolId,
+                password,
+            };
+
+            const response = await axios.post(
+                BASE_URL + 'auth/admin/signup',
+                reqBody
+            );
+            console.log('Response: ', response);
+            if (response.status === 201)
+                setErrorMessage('Registered Successfully! You can login now.');
+        } catch (error: any) {
+            setErrorMessage(error.response.data.message);
+            console.log('Response Error:', error.response.data);
+        }
     };
 
-    const phoneNumberChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setPhoneNumber(e.nativeEvent.text);
-    };
-
-    const addressChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setAddress(e.nativeEvent.text);
-    };
-
-    const schoolIdChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setSchoolId(e.nativeEvent.text);
-    };
-
-    const passwordChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setPassword(e.nativeEvent.text);
-    };
-
-    const confirmPasswordChangeHandler = (
-        e: NativeSyntheticEvent<TextInputChangeEventData>
-    ) => {
-        setConfirmPassword(e.nativeEvent.text);
-    };
-
-    const signUpHandler = () => {
-        console.log(
-            name,
-            phoneNumber,
-            address,
-            schoolId,
-            password,
-            confirmPassword
-        );
+    const closeErrorMessage = () => {
+        setErrorMessage(null);
     };
 
     return (
@@ -79,140 +83,234 @@ const SignUp = () => {
             <View style={styles.container}>
                 {/* Background Image with Gradient */}
 
+                {errorMessage && (
+                    <ErrorBottom
+                        message={errorMessage}
+                        onClose={closeErrorMessage}
+                    />
+                )}
+
                 {/* Keyboard Avoiding View for handling keyboard */}
                 <KeyboardAvoidingView
                     behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                     style={styles.keyboardView}
                 >
-                    {/* Login Form */}
-                    <SafeAreaView style={styles.formContainer}>
-                        {/* Heading and Subheading */}
-                        <View style={styles.headingContainer}>
-                            <Text style={styles.heading}>Sign Up</Text>
-                            <Text style={styles.subHeading}>
-                                Please Signup to continue.
-                            </Text>
-                        </View>
+                    <Formik
+                        initialValues={{
+                            name: '',
+                            phoneNumber: '',
+                            address: '',
+                            schoolId: '',
+                            password: '',
+                            confirmPassword: '',
+                        }}
+                        onSubmit={signUpHandler}
+                        validationSchema={signUpSchema}
+                    >
+                        {({
+                            handleChange,
+                            handleBlur,
+                            handleSubmit,
+                            errors,
+                            values,
+                            dirty,
+                            touched,
+                            isValid,
+                        }) => (
+                            <SafeAreaView style={styles.formContainer}>
+                                {/* Heading and Subheading */}
+                                <View style={styles.headingContainer}>
+                                    <Text style={styles.heading}>Sign Up</Text>
+                                    <Text style={styles.subHeading}>
+                                        Please Signup to continue.
+                                    </Text>
+                                </View>
 
-                        {/* Name  */}
-                        <View style={styles.inputContainer}>
-                            <FontAwesome
-                                name='user'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='Name'
-                                placeholderTextColor='#9e9e9e'
-                                style={[styles.input, { marginLeft: 6 }]}
-                                value={name}
-                                onChange={nameChangeHandler}
-                            />
-                        </View>
+                                {/* Name  */}
+                                <View style={styles.inputContainer}>
+                                    <FontAwesome
+                                        name='user'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='Name'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={[
+                                            styles.input,
+                                            { marginLeft: 6 },
+                                        ]}
+                                        value={values.name}
+                                        onChangeText={handleChange('name')}
+                                        onBlur={handleBlur('name')}
+                                    />
+                                </View>
+                                {errors.name && touched.name && (
+                                    <Text style={styles.errorText}>
+                                        {errors.name}
+                                    </Text>
+                                )}
 
-                        {/* Phone Number  */}
-                        <View style={styles.inputContainer}>
-                            <FontAwesome
-                                name='phone-alt'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='Phone Number'
-                                placeholderTextColor='#9e9e9e'
-                                style={[styles.input, { paddingLeft: 3 }]}
-                                keyboardType='number-pad'
-                                value={phoneNumber}
-                                onChange={phoneNumberChangeHandler}
-                            />
-                        </View>
+                                {/* Phone Number  */}
+                                <View style={styles.inputContainer}>
+                                    <FontAwesome
+                                        name='phone-alt'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='Phone Number'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={[
+                                            styles.input,
+                                            { paddingLeft: 3 },
+                                        ]}
+                                        keyboardType='number-pad'
+                                        value={values.phoneNumber}
+                                        onChangeText={handleChange(
+                                            'phoneNumber'
+                                        )}
+                                        onBlur={handleBlur('phoneNumber')}
+                                    />
+                                </View>
+                                {errors.phoneNumber && touched.phoneNumber && (
+                                    <Text style={styles.errorText}>
+                                        {errors.phoneNumber}
+                                    </Text>
+                                )}
 
-                        {/* Address  */}
-                        <View style={styles.inputContainer}>
-                            <FntAwesome
-                                name='location-dot'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='Address'
-                                placeholderTextColor='#9e9e9e'
-                                style={[styles.input, { marginLeft: 8 }]}
-                                keyboardType='number-pad'
-                                value={address}
-                                onChange={addressChangeHandler}
-                            />
-                        </View>
+                                {/* Address  */}
+                                <View style={styles.inputContainer}>
+                                    <FntAwesome
+                                        name='location-dot'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='Address'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={[
+                                            styles.input,
+                                            { marginLeft: 8 },
+                                        ]}
+                                        keyboardType='default'
+                                        value={values.address}
+                                        onChangeText={handleChange('address')}
+                                        onBlur={handleBlur('address')}
+                                    />
+                                </View>
+                                {errors.address && touched.address && (
+                                    <Text style={styles.errorText}>
+                                        {errors.address}
+                                    </Text>
+                                )}
 
-                        {/* School Id  */}
-                        <View style={styles.inputContainer}>
-                            <FontAwesome
-                                name='school'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='School Id'
-                                placeholderTextColor='#9e9e9e'
-                                style={styles.input}
-                                value={schoolId}
-                                onChange={schoolIdChangeHandler}
-                            />
-                        </View>
+                                {/* School Id  */}
+                                <View style={styles.inputContainer}>
+                                    <FontAwesome
+                                        name='school'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='School Id'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={styles.input}
+                                        value={values.schoolId}
+                                        onChangeText={handleChange('schoolId')}
+                                        onBlur={handleBlur('schoolId')}
+                                    />
+                                </View>
+                                {errors.schoolId && touched.schoolId && (
+                                    <Text style={styles.errorText}>
+                                        {errors.schoolId}
+                                    </Text>
+                                )}
 
-                        {/* Password Input */}
-                        <View style={styles.inputContainer}>
-                            <FontAwesome
-                                name='lock'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='Password'
-                                placeholderTextColor='#9e9e9e'
-                                style={[styles.input, styles.inputPadding]}
-                                secureTextEntry
-                                value={password}
-                                onChange={passwordChangeHandler}
-                            />
-                        </View>
+                                {/* Password Input */}
+                                <View style={styles.inputContainer}>
+                                    <FontAwesome
+                                        name='lock'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='Password'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={[
+                                            styles.input,
+                                            styles.inputPadding,
+                                        ]}
+                                        secureTextEntry
+                                        value={values.password}
+                                        onChangeText={handleChange('password')}
+                                        onBlur={handleBlur('password')}
+                                    />
+                                </View>
+                                {errors.password && touched.password && (
+                                    <Text style={styles.errorText}>
+                                        {errors.password}
+                                    </Text>
+                                )}
 
-                        {/* Confirm Password Input */}
-                        <View style={styles.inputContainer}>
-                            <FontAwesome
-                                name='lock'
-                                size={20}
-                                color='#9e9e9e'
-                                style={styles.icon}
-                            />
-                            <TextInput
-                                placeholder='Confirm Password'
-                                placeholderTextColor='#9e9e9e'
-                                style={[styles.input, styles.inputPadding]}
-                                secureTextEntry
-                                value={confirmPassword}
-                                onChange={confirmPasswordChangeHandler}
-                            />
-                        </View>
+                                {/* Confirm Password Input */}
+                                <View style={styles.inputContainer}>
+                                    <FontAwesome
+                                        name='lock'
+                                        size={20}
+                                        color='#9e9e9e'
+                                        style={styles.icon}
+                                    />
+                                    <TextInput
+                                        placeholder='Confirm Password'
+                                        placeholderTextColor='#9e9e9e'
+                                        style={[
+                                            styles.input,
+                                            styles.inputPadding,
+                                        ]}
+                                        secureTextEntry
+                                        value={values.confirmPassword}
+                                        onChangeText={handleChange(
+                                            'confirmPassword'
+                                        )}
+                                        onBlur={handleBlur('confirmPassword')}
+                                    />
+                                </View>
+                                {errors.confirmPassword &&
+                                    touched.confirmPassword && (
+                                        <Text style={styles.errorText}>
+                                            {errors.confirmPassword}
+                                        </Text>
+                                    )}
 
-                        {/* Login Button */}
-                        <TouchableOpacity
-                            style={styles.loginButton}
-                            onPress={signUpHandler}
-                        >
-                            <Text style={styles.loginButtonText}>SIGN UP</Text>
-                            <FontAwesome
-                                name='arrow-right'
-                                size={20}
-                                color='#fff'
-                            />
-                        </TouchableOpacity>
-                    </SafeAreaView>
+                                {/* Login Button */}
+                                <TouchableOpacity
+                                    style={[
+                                        styles.loginButton,
+                                        {
+                                            opacity: isValid && dirty ? 1 : 0.6,
+                                        }, // Make button less prominent if invalid
+                                    ]}
+                                    disabled={!isValid || !dirty}
+                                    onPress={() => handleSubmit()}
+                                >
+                                    <Text style={styles.loginButtonText}>
+                                        SIGN UP
+                                    </Text>
+                                    <FontAwesome
+                                        name='arrow-right'
+                                        size={20}
+                                        color='#fff'
+                                    />
+                                </TouchableOpacity>
+                            </SafeAreaView>
+                        )}
+                    </Formik>
                 </KeyboardAvoidingView>
             </View>
         </TouchableWithoutFeedback>
@@ -315,6 +413,13 @@ const styles = StyleSheet.create({
     },
     inputPadding: {
         paddingLeft: 7,
+    },
+    errorText: {
+        color: 'red',
+        fontSize: 14,
+        marginBottom: 10,
+        marginTop: -10,
+        marginLeft: 20,
     },
 });
 

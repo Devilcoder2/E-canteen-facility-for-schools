@@ -22,6 +22,9 @@ import {
 
 import { object, string } from 'yup';
 import { Formik } from 'formik';
+import axios from 'axios';
+import { BASE_URL } from '../../constants';
+import Error from './../../components/Error';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -43,13 +46,38 @@ const Login = () => {
     const navigation =
         useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
     const signUpHandler = () => {
         navigation.navigate('SSignUp');
     };
 
-    const loginHandler = (values: any) => {
-        console.log(values);
-        // navigation.navigate('StudentHome');
+    const loginHandler = async (values: any) => {
+        const schoolId = values.schoolId;
+        const password = values.password;
+        const email = values.email;
+
+        const reqBody = {
+            email,
+            schoolId,
+            password,
+        };
+
+        try {
+            const response = await axios.post(
+                BASE_URL + 'auth/student/login',
+                reqBody
+            );
+            console.log('Response: ', response);
+            if (response.status === 200) navigation.navigate('StudentHome');
+        } catch (error: any) {
+            setErrorMessage(error.response.data.message);
+            console.log('Response Error:', error.response.data);
+        }
+    };
+
+    const closeErrorMessage = () => {
+        setErrorMessage(null);
     };
 
     return (
@@ -66,6 +94,14 @@ const Login = () => {
                         colors={['rgba(0, 0, 0, 0.7)', 'rgba(0, 0, 0, 0.1)']}
                         style={styles.gradient}
                     />
+
+                    {/* Display error message if any */}
+                    {errorMessage && (
+                        <Error
+                            message={errorMessage}
+                            onClose={closeErrorMessage}
+                        />
+                    )}
 
                     {/* Keyboard Avoiding View for handling keyboard */}
                     <KeyboardAvoidingView
@@ -215,8 +251,7 @@ const Login = () => {
                                     <View style={styles.footer}>
                                         <Text>Don’t have an account? </Text>
                                         <TouchableOpacity
-                                            onPress={() => handleSubmit()}
-                                            disabled={!isValid}
+                                            onPress={signUpHandler}
                                         >
                                             <Text style={styles.signUpText}>
                                                 Sign up
