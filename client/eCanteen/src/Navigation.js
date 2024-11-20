@@ -5,12 +5,18 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import FontAwesome from '@expo/vector-icons/FontAwesome5';
 import * as Haptics from 'expo-haptics';
 
+//STUDENT IMPORTS
 import StudentLogin from './screens/Student/Login';
 import StudentSignUp from './screens/Student/SignUp';
 import StudentHome from './screens/Student/Home';
+
+//ADMIN IMPORTS
 import AdminLogin from './screens/Admin/Login';
 import AdminSignUp from './screens/Admin/SignUp';
 import AdminHome from './screens/Admin/Home';
+import AdminOrders from './screens/Admin/Orders';
+import AdminProfile from './screens/Admin/Profile';
+import AdminNewItem from './screens/Admin/NewItem';
 
 //Stack Navigator
 const StudentLoginStack = createNativeStackNavigator();
@@ -47,6 +53,8 @@ const StackGroupAdminLogin = () => {
 
 //Tab Bottom
 const Tab = createBottomTabNavigator();
+const AdminTab = createBottomTabNavigator();
+
 const TabGroup = () => {
     return (
         <Tab.Navigator
@@ -105,11 +113,66 @@ const TabGroup = () => {
     );
 };
 
+const AdminTabGroup = () => {
+    return (
+        <AdminTab.Navigator
+            screenOptions={({ route, navigation }) => ({
+                tabBarLabel: ({ focused }) => (
+                    <Text
+                        style={{
+                            fontSize: focused ? 12 : 11,
+                            marginTop: 5,
+                            fontWeight: focused ? 'bold' : 'normal',
+                            color: focused ? 'black' : 'gray',
+                        }}
+                    >
+                        {route.name === 'AHome'
+                            ? 'Home'
+                            : route.name === 'AOrders'
+                            ? 'Orders'
+                            : 'Add New Item'}
+                    </Text>
+                ),
+                tabBarActiveTintColor: '#EFC544',
+                tabBarInactiveTintColor: '#A2A2A2',
+                headerShown: false,
+                tabBarIcon: ({ color, focused, size }) => {
+                    let iconName;
+
+                    if (route.name === 'AHome') {
+                        iconName = 'home';
+                    } else if (route.name === 'AOrders') {
+                        iconName = 'shopping-cart';
+                    } else if (route.name === 'ANewItem') {
+                        iconName = 'plus-square';
+                    }
+                    return (
+                        <FontAwesome
+                            name={iconName}
+                            size={size}
+                            color={color}
+                        />
+                    );
+                },
+            })}
+            screenListeners={{
+                tabPress: () => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                },
+            }}
+        >
+            <AdminTab.Screen name='AHome' component={AdminHome} />
+            <AdminTab.Screen name='AOrders' component={AdminOrders} />
+            <AdminTab.Screen name='ANewItem' component={AdminNewItem} />
+        </AdminTab.Navigator>
+    );
+};
+
 const StackGroupMain = () => {
     return (
         <MainStack.Navigator screenOptions={{ headerShown: false }}>
             <MainStack.Screen name='LoginTabs' component={TabGroup} />
-            <MainStack.Screen name='AdminHome' component={AdminHome} />
+            <MainStack.Screen name='AdminHome' component={AdminTabGroup} />
             <MainStack.Screen name='StudentHome' component={StudentHome} />
         </MainStack.Navigator>
     );
