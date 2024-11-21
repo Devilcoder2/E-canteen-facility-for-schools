@@ -3,7 +3,7 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack/lib/typescript/commonjs/src/types';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Formik } from 'formik';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Dimensions,
     ImageBackground,
@@ -23,6 +23,7 @@ import { object, string } from 'yup';
 import axios from 'axios';
 import { BASE_URL } from '../../constants';
 import Error from './../../components/Error';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -58,7 +59,14 @@ const Login = () => {
                 reqBody
             );
             console.log('Response: ', response);
-            if (response.status === 200) navigation.navigate('AdminHome');
+            if (response.status === 200) {
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'AdminHome' }],
+                });
+                AsyncStorage.setItem('adminToken', response.data.token);
+                navigation.navigate('AdminHome');
+            }
         } catch (error: any) {
             setErrorMessage(error.response.data.message);
             console.log('Response Error:', error.response.data);

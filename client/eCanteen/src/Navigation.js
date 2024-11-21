@@ -17,6 +17,7 @@ import AdminHome from './screens/Admin/Home';
 import AdminOrders from './screens/Admin/Orders';
 import AdminProfile from './screens/Admin/Profile';
 import AdminNewItem from './screens/Admin/NewItem';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 //Stack Navigator
 const StudentLoginStack = createNativeStackNavigator();
@@ -113,6 +114,26 @@ const TabGroup = () => {
     );
 };
 
+//Drawer
+const Drawer = createDrawerNavigator();
+const AdminProfileDrawer = () => {
+    return (
+        <Drawer.Navigator
+            initialRouteName='AdminMainHome'
+            drawerContent={(props) => <AdminProfile {...props} />}
+            screenOptions={{
+                headerShown: false,
+                drawerStyle: { width: '100%' },
+                drawerPosition: 'right',
+                swipeEnabled: false,
+            }}
+        >
+            <Drawer.Screen name='AdminMainHome' component={AdminHome} />
+            <Drawer.Screen name='AdminProfile' component={AdminProfile} />
+        </Drawer.Navigator>
+    );
+};
+
 const AdminTabGroup = () => {
     return (
         <AdminTab.Navigator
@@ -161,7 +182,7 @@ const AdminTabGroup = () => {
                 },
             }}
         >
-            <AdminTab.Screen name='AHome' component={AdminHome} />
+            <AdminTab.Screen name='AHome' component={AdminProfileDrawer} />
             <AdminTab.Screen name='AOrders' component={AdminOrders} />
             <AdminTab.Screen name='ANewItem' component={AdminNewItem} />
         </AdminTab.Navigator>
