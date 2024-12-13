@@ -19,9 +19,13 @@ import AdminProfile from './screens/Admin/Profile';
 import AdminNewItem from './screens/Admin/NewItem';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
+//OTHER IMPORTS
+import OnBoardingScreen from './screens/OnBoardingScreen';
+
 //Stack Navigator
 const StudentLoginStack = createNativeStackNavigator();
 const AdminLoginStack = createNativeStackNavigator();
+const OnBoardingStack = createNativeStackNavigator();
 const MainStack = createNativeStackNavigator();
 
 const StackGroupStudentLogin = () => {
@@ -199,10 +203,26 @@ const StackGroupMain = () => {
     );
 };
 
+const OnBoardingStackGroup = () => {
+    return (
+        <OnBoardingStack.Navigator screenOptions={{ headerShown: false }}>
+            <OnBoardingStack.Screen
+                name='OnBoarding'
+                component={OnBoardingScreen}
+            />
+            <OnBoardingStack.Screen
+                name='Main'
+                component={StackGroupMain}
+                options={{ gestureEnabled: false }}
+            />
+        </OnBoardingStack.Navigator>
+    );
+};
+
 export default function Navigation() {
     return (
         <NavigationContainer>
-            <StackGroupMain />
+            <OnBoardingStackGroup />
         </NavigationContainer>
     );
 }
