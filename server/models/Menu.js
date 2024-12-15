@@ -6,8 +6,13 @@ const menuSchema = new mongoose.Schema(
         price: { type: Number, required: true },
         image: { type: String }, // URL for the image
         ratings: { type: Number, default: 4 },
-        category: { type: String, enum: ['veg', 'non-veg'], required: true },
-        label: {type: String, required: true},
+        category: {
+            type: String,
+            enum: ['veg', 'non-veg'],
+            required: true,
+            set: (value) => value.toLowerCase(),
+        },
+        label: { type: String, required: true },
         description: { type: String },
         adminId: {
             type: mongoose.Schema.Types.ObjectId,
